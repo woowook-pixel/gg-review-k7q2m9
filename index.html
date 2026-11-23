@@ -1,5 +1,5 @@
-<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>グルグル日和 発音チェック</title>
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>グルグル日和 발음 체크</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -96,12 +96,12 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px soli
     <div class="disc" id="disc" aria-hidden="true"></div>
     <div>
       <h1>グルグル日和</h1>
-      <p class="sub">歌詞と発音のチェック · 歌のある5曲</p>
+      <p class="sub">가사와 발음 체크 · 노래가 있는 5곡</p>
     </div>
   </header>
-    <p class="how">曲を選んで再生してください。歌詞の行をタップすると、その行の少し前から再生します。発音や歌詞が気になる行は「要修正」を押してメモを書いてください。全部聞き終わったら、いちばん下の「チェック結果をコピー」を押して、メッセージに貼り付けて送ってください。書いた内容はこのブラウザに保存されるので、途中でやめても続きから書けます。</p>
+    <p class="how">곡을 골라 재생하세요. 가사 줄을 누르면 그 줄 조금 앞부터 재생됩니다. 발음이나 가사가 신경 쓰이는 줄은 「수정 필요」를 누르고 메모를 적어 주세요. 다 들었으면 맨 아래 「체크 결과 복사」를 눌러 메시지에 붙여 넣어 보내 주세요. 적은 내용은 이 브라우저에 저장되므로 중간에 멈춰도 이어서 쓸 수 있습니다.</p>
 
-  <nav class="tracks" id="tracks" role="tablist" aria-label="曲"></nav>
+  <nav class="tracks" id="tracks" role="tablist" aria-label="곡"></nav>
 
   <div class="toolbar">
     <span class="count" id="count"></span>
@@ -110,27 +110,27 @@ button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px soli
   <section class="sheet" id="sheet" aria-live="off"></section>
 
   <div class="general">
-    <label for="gen">この曲全体へのコメント</label>
-    <textarea id="gen" placeholder="例：全体的に「ん」が強すぎる"></textarea>
+    <label for="gen">이 곡 전체에 대한 코멘트</label>
+    <textarea id="gen" placeholder="예: 전체적으로 「ん」이 너무 강하다"></textarea>
   </div>
 
   <section class="out">
-    <h2>チェック結果</h2>
-    <p>全5曲の「要修正」とコメントをテキストにまとめます。メッセージやメールに貼り付けて送ってください。</p>
-    <button class="btn" id="copy">チェック結果をコピー</button><span class="toast" id="toast" hidden>コピーしました</span>
-    <textarea id="outText" readonly hidden aria-label="チェック結果"></textarea>
+    <h2>체크 결과</h2>
+    <p>전 5곡의 「수정 필요」와 코멘트를 텍스트로 정리합니다. 메시지나 메일에 붙여 넣어 보내 주세요.</p>
+    <button class="btn" id="copy">체크 결과 복사</button><span class="toast" id="toast" hidden>복사했습니다</span>
+    <textarea id="outText" readonly hidden aria-label="체크 결과"></textarea>
   </section>
 </div>
 
 <div class="player">
   <div class="pin">
     <div class="prow">
-      <button class="play" id="play" aria-label="再生">▶</button>
+      <button class="play" id="play" aria-label="재생">▶</button>
       <div class="pt"><b id="pTitle"></b><span id="pTime">0:00 / 0:00</span></div>
-      <button class="sm" id="back">−5秒</button>
-      <button class="sm" id="loop" aria-pressed="false" title="今の行をくり返し">行リピート</button>
+      <button class="sm" id="back">−5초</button>
+      <button class="sm" id="loop" aria-pressed="false" title="지금 줄 반복">줄 반복</button>
     </div>
-    <input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="再生位置">
+    <input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="재생 위치">
   </div>
 </div>
 <audio id="audio" preload="metadata"></audio>
@@ -156,22 +156,22 @@ function renderTracks(){
     return `<button role="tab" id="tab${ti}" aria-selected="${ti===cur}" data-t="${ti}">
       <span class="tno">TRACK ${t.num}</span>
       <span class="tname">${esc(t.title)}</span>
-      <span class="tprog ${c===n?"done":""}">${c}/${n}行 確認</span></button>`}).join("");
+      <span class="tprog ${c===n?"done":""}">${c}/${n}줄 확인</span></button>`}).join("");
 }
 function renderSheet(){
   const t=TRACKS[cur];
   $("sheet").innerHTML=t.lines.map((l,i)=>{
     const m=st.marks[k(cur,i)]||"";
     return `<div class="ln" data-i="${i}">${l[2]?`<div class="secl">${esc(l[2])}</div>`:""}
-      <button class="ts" data-seek="${l[0]}" aria-label="${fmt(l[0])}から再生">${fmt(l[0])}</button>
+      <button class="ts" data-seek="${l[0]}" aria-label="${fmt(l[0])}부터 재생">${fmt(l[0])}</button>
       <div class="txt" data-seek="${l[0]}">
         <div class="jp">${esc(l[1])}</div>
       </div>
       <div class="marks">
         <button class="mk ok" data-mark="ok" aria-pressed="${m==="ok"}">OK</button>
-        <button class="mk fx" data-mark="fix" aria-pressed="${m==="fix"}">要修正</button>
+        <button class="mk fx" data-mark="fix" aria-pressed="${m==="fix"}">수정 필요</button>
       </div>
-      ${m==="fix"?`<div class="memo"><textarea id="memo-${cur}-${i}" data-memo="${i}" placeholder="例：「まわる」の「わ」が「ば」に聞こえる">${esc(st.memos[k(cur,i)]||"")}</textarea></div>`:""}
+      ${m==="fix"?`<div class="memo"><textarea id="memo-${cur}-${i}" data-memo="${i}" placeholder="예: 「まわる」의 「わ」가 「ば」로 들린다">${esc(st.memos[k(cur,i)]||"")}</textarea></div>`:""}
     </div>`}).join("");
   $("gen").value=st.gen[cur]||"";
   $("pTitle").textContent=`${t.num}. ${t.title}`;
@@ -180,7 +180,7 @@ function renderSheet(){
 }
 function updateCount(){
   const t=TRACKS[cur],fix=t.lines.filter((_,i)=>st.marks[k(cur,i)]==="fix").length,done=t.lines.filter((_,i)=>st.marks[k(cur,i)]).length;
-  $("count").textContent=`${t.lines.length}行中 ${done}行確認 · 要修正 ${fix}`;
+  $("count").textContent=`${t.lines.length}줄 중 ${done}줄 확인 · 수정 필요 ${fix}`;
 }
 function lineAt(p){const L=TRACKS[cur].lines;let idx=-1;L.forEach((l,i)=>{if(p>=l[0])idx=i});return idx}
 function highlight(){
@@ -196,12 +196,12 @@ function tick(){
   highlight();
 }
 function play(){
-  playing=true;$("play").textContent="❚❚";$("play").setAttribute("aria-label","一時停止");$("disc").classList.add("spin");
+  playing=true;$("play").textContent="❚❚";$("play").setAttribute("aria-label","일시정지");$("disc").classList.add("spin");
   if(TRACKS[cur].src){audio.currentTime=pos;audio.play().catch(()=>{})}
   clearInterval(timer);timer=setInterval(tick,250);
 }
 function pause(){
-  playing=false;$("play").textContent="▶";$("play").setAttribute("aria-label","再生");$("disc").classList.remove("spin");
+  playing=false;$("play").textContent="▶";$("play").setAttribute("aria-label","재생");$("disc").classList.remove("spin");
   if(TRACKS[cur].src)audio.pause();clearInterval(timer);
 }
 function seek(p){pos=Math.max(0,Math.min(p,TRACKS[cur].dur));if(TRACKS[cur].src)audio.currentTime=pos;highlight()}
@@ -223,14 +223,14 @@ $("loop").onclick=()=>{loop=!loop;$("loop").setAttribute("aria-pressed",loop)};
 $("seek").oninput=e=>seek(+e.target.value);
 
 function buildOut(){
-  let o="【グルグル日和 発音チェック】\n";
+  let o="【グルグル日和 발음 체크】\n";
   TRACKS.forEach((t,ti)=>{
     const fixes=t.lines.map((l,i)=>[l,i]).filter(([_,i])=>st.marks[k(ti,i)]==="fix");
     const done=t.lines.filter((_,i)=>st.marks[k(ti,i)]).length;
-    o+=`\n■ ${t.num}. ${t.title}（${done}/${t.lines.length}行確認）\n`;
-    if(!fixes.length&&!st.gen[ti])o+="  要修正なし\n";
-    fixes.forEach(([l,i])=>{o+=`  [${fmt(l[0])}] ${plain(l[1])}\n    → ${(st.memos[k(ti,i)]||"（メモなし）").replace(/\n/g," ")}\n`});
-    if(st.gen[ti])o+=`  全体: ${st.gen[ti].replace(/\n/g," ")}\n`;
+    o+=`\n■ ${t.num}. ${t.title}（${done}/${t.lines.length}줄 확인）\n`;
+    if(!fixes.length&&!st.gen[ti])o+="  수정 필요 없음\n";
+    fixes.forEach(([l,i])=>{o+=`  [${fmt(l[0])}] ${plain(l[1])}\n    → ${(st.memos[k(ti,i)]||"（메모 없음）").replace(/\n/g," ")}\n`});
+    if(st.gen[ti])o+=`  전체: ${st.gen[ti].replace(/\n/g," ")}\n`;
   });
   return o;
 }
