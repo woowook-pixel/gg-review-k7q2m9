@@ -1,0 +1,248 @@
+<!DOCTYPE html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>グルグル日和 発音チェック</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Noto+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; track strip on top, lyric sheet in the middle, player docked to the bottom edge */
+:root{
+  --sky:#eaf2f7; --paper:#ffffff; --ink:#1d2b3a; --muted:#5e7184; --line:#d3e0ea;
+  --sun:#e9a21b; --sun-soft:#fdf1d6; --ok:#2f8a5b; --ok-soft:#e1f3e9; --fix:#c8553d; --fix-soft:#fbe6e1;
+  --f-display:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Noto Sans JP",sans-serif;
+  --f-body:"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --sky:#121b24; --paper:#1a2632; --ink:#e6eef5; --muted:#93a6b8; --line:#2c3c4c;
+  --sun:#f2b544; --sun-soft:#3a2e15; --ok:#5cc48d; --ok-soft:#173326; --fix:#ee8a74; --fix-soft:#3d221c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --sky:#121b24; --paper:#1a2632; --ink:#e6eef5; --muted:#93a6b8; --line:#2c3c4c;
+  --sun:#f2b544; --sun-soft:#3a2e15; --ok:#5cc48d; --ok-soft:#173326; --fix:#ee8a74; --fix-soft:#3d221c; color-scheme:dark}
+body{background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.6}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 150px}
+header{display:flex;gap:16px;align-items:center}
+.disc{flex:none;width:64px;height:64px;border-radius:50%;background:
+  radial-gradient(circle,var(--sun) 0 18%,var(--paper) 19% 22%,transparent 23%),
+  repeating-radial-gradient(circle,var(--ink) 0 2px,color-mix(in srgb,var(--ink) 82%,var(--sky)) 2px 4px)}
+.disc.spin{animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.disc.spin{animation:none}}
+h1{font-family:var(--f-display);font-weight:900;font-size:clamp(26px,6vw,36px);line-height:1.15;margin:0;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin:2px 0 0}
+.note{margin:18px 0 0;padding:10px 14px;border-radius:10px;background:var(--sun-soft);font-size:13px}
+.how{margin:14px 0 0;color:var(--muted);font-size:13px}
+.tracks{display:flex;gap:8px;overflow-x:auto;margin:22px 0 0;padding-bottom:4px;scrollbar-width:thin}
+.tracks button{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer;min-width:120px;text-align:left}
+.tracks button[aria-selected="true"]{border-color:var(--sun);box-shadow:inset 0 0 0 1px var(--sun)}
+.tno{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.tname{font-family:var(--f-display);font-weight:700;font-size:15px}
+.tprog{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.tprog.done{color:var(--ok)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin:20px 0 10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--paper)}
+.seg button{font:inherit;font-size:13px;border:0;background:none;color:var(--muted);padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sheet{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.secl{grid-column:1 / -1;font-size:11px;letter-spacing:.08em;color:var(--sun);font-weight:700;margin-top:2px}
+.ln{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:4px 12px;padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.ln:first-child{border-top:0}
+.ln.now{background:var(--sun-soft)}
+.ts{font-family:var(--f-mono);font-size:12px;color:var(--muted);background:none;border:0;padding:4px 0;cursor:pointer;text-align:left;font-variant-numeric:tabular-nums}
+.ts:hover{color:var(--ink)}
+.txt{min-width:0;cursor:pointer}
+.jp{font-family:var(--f-display);font-weight:700;font-size:19px;line-height:2}
+.jp rt{font-family:var(--f-body);font-weight:400;font-size:10px;color:var(--muted)}
+.hide-ruby rt{display:none}
+.ro{font-size:13px;color:var(--muted);line-height:1.4}
+.marks{display:flex;gap:6px}
+.mk{font:inherit;font-size:12px;border:1px solid var(--line);background:none;color:var(--muted);border-radius:8px;padding:4px 9px;cursor:pointer;white-space:nowrap}
+.mk.ok[aria-pressed="true"]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.mk.fx[aria-pressed="true"]{background:var(--fix-soft);border-color:var(--fix);color:var(--fix)}
+.memo{grid-column:2 / 4}
+.memo textarea{width:100%;box-sizing:border-box;font:inherit;font-size:14px;color:var(--ink);background:var(--sky);border:1px solid var(--fix);border-radius:8px;padding:8px 10px;resize:vertical;min-height:44px}
+.general{margin:16px 0 0}
+.general label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.general textarea{width:100%;box-sizing:border-box;font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-height:64px;resize:vertical}
+.out{margin:28px 0 0;padding:16px;border-radius:16px;border:1px dashed var(--line)}
+.out h2{font-family:var(--f-display);font-size:18px;margin:0 0 4px}
+.out p{margin:0 0 12px;font-size:13px;color:var(--muted)}
+.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:10px 18px;cursor:pointer;background:var(--ink);color:var(--paper)}
+.toast{margin-left:10px;font-size:13px;color:var(--ok)}
+#outText{width:100%;box-sizing:border-box;margin-top:12px;font-family:var(--f-mono);font-size:12px;background:var(--sky);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px;min-height:120px}
+.player{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--paper);border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:10px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+.pin{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:10px}
+.play{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--sun);color:#1d2b3a;font-size:18px;cursor:pointer}
+.pt{flex:1;min-width:0}
+.pt b{display:block;font-family:var(--f-display);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pt span{font-size:12px;color:var(--muted);font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.sm{font:inherit;font-size:12px;border:1px solid var(--line);background:none;color:var(--ink);border-radius:8px;padding:6px 8px;cursor:pointer}
+.sm[aria-pressed="true"]{border-color:var(--sun);background:var(--sun-soft)}
+input[type=range]{width:100%;accent-color:var(--sun)}
+button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--sun);outline-offset:2px}
+@media (max-width:480px){
+  .ln{grid-template-columns:44px minmax(0,1fr)}
+  .marks{grid-column:2}
+  .memo{grid-column:2}
+  .jp{font-size:17px}
+}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="disc" id="disc" aria-hidden="true"></div>
+    <div>
+      <h1>グルグル日和</h1>
+      <p class="sub">歌詞と発音のチェック · 歌のある5曲</p>
+    </div>
+  </header>
+    <p class="how">曲を選んで再生してください。歌詞の行をタップすると、その行の少し前から再生します。発音や歌詞が気になる行は「要修正」を押してメモを書いてください。全部聞き終わったら、いちばん下の「チェック結果をコピー」を押して、メッセージに貼り付けて送ってください。書いた内容はこのブラウザに保存されるので、途中でやめても続きから書けます。</p>
+
+  <nav class="tracks" id="tracks" role="tablist" aria-label="曲"></nav>
+
+  <div class="toolbar">
+    <span class="count" id="count"></span>
+  </div>
+
+  <section class="sheet" id="sheet" aria-live="off"></section>
+
+  <div class="general">
+    <label for="gen">この曲全体へのコメント</label>
+    <textarea id="gen" placeholder="例：全体的に「ん」が強すぎる"></textarea>
+  </div>
+
+  <section class="out">
+    <h2>チェック結果</h2>
+    <p>全5曲の「要修正」とコメントをテキストにまとめます。メッセージやメールに貼り付けて送ってください。</p>
+    <button class="btn" id="copy">チェック結果をコピー</button><span class="toast" id="toast" hidden>コピーしました</span>
+    <textarea id="outText" readonly hidden aria-label="チェック結果"></textarea>
+  </section>
+</div>
+
+<div class="player">
+  <div class="pin">
+    <div class="prow">
+      <button class="play" id="play" aria-label="再生">▶</button>
+      <div class="pt"><b id="pTitle"></b><span id="pTime">0:00 / 0:00</span></div>
+      <button class="sm" id="back">−5秒</button>
+      <button class="sm" id="loop" aria-pressed="false" title="今の行をくり返し">行リピート</button>
+    </div>
+    <input type="range" id="seek" min="0" max="100" step="0.1" value="0" aria-label="再生位置">
+  </div>
+</div>
+<audio id="audio" preload="metadata"></audio>
+
+<script>
+const TRACKS=[{"num": "02", "title": "グルグルライド", "dur": 179.7, "src": "audio/02.m4a", "lines": [[15.12, "さあ よるのまちへ", "Aメロ"], [19.2, "ペダルこいで", ""], [23.04, "ふりむかずに", ""], [26.88, "かけぬけてく", ""], [30.72, "どこでもいけるさ", "Bメロ"], [38.4, "じぶんで ぼくのみちさ", ""], [46.08, "グルグルライド かぜをつかまえ", "サビ"], [53.76, "グルグルライド とまらない", ""], [68.88, "いま ちずをひろげ", "Aメロ 2"], [72.96, "みちをえらび", ""], [76.8, "よていたてて", ""], [80.64, "ゆめをのせて", ""], [84.48, "たのしみふくらむ", "Bメロ 2"], [92.16, "ひにちも ぜんぶきめた", ""], [99.84, "グルグルライド かぜをつかまえ", "サビ 2"], [107.52, "グルグルライド とまらない", ""], [115.2, "あめのひ まよわず", "ブリッジ"], [122.88, "すすむよ きみとなら", ""], [130.56, "グルグルライド ゆめのさきまで", "ラストサビ"], [138.24, "グルグルライド はしりつづけ", ""]]}, {"num": "03", "title": "てっぺんソーダ", "dur": 185.7, "src": "audio/03.m4a", "lines": [[12.0, "ペダルふむ おもたいね", "Aメロ"], [15.0, "あせがでる まだまだ", ""], [18.0, "みちのさき くもがわく", ""], [21.0, "せみのこえ がんばれ", ""], [24.0, "ふりむけば まちとおく", ""], [27.0, "かぜがふく もうすぐ", ""], [30.0, "いききらし のどかわく", ""], [33.0, "ポケットの ひゃくえん", ""], [36.188, "みえてきた あおいそら", "Bメロ"], [39.188, "てっぺん までは", ""], [42.188, "あとちょっと せーのでね", ""], [45.0, "ふみこんで", ""], [46.5, "ゴー", ""], [48.188, "のぼりきり てっぺん", "サビ"], [51.0, "はじけてる ソーダ", ""], [54.188, "グルグルと まわる", ""], [57.0, "したのまち キラキラ", ""], [60.188, "あせのつぶ かわいて", ""], [63.0, "からっぽの むねのなか", ""], [66.0, "そらいろに とけてく", ""], [84.0, "となりでは つばめたち", "Aメロ 2"], [87.0, "すいすいと ずるいよ", ""], [90.0, "まけないぞ たちこいで", ""], [93.0, "ハンドルを ぎゅっとね", ""], [96.188, "くるしくて わらえるね", "Bメロ 2"], [99.188, "へんなの でもね", ""], [102.188, "このさかが すきかもね", ""], [105.0, "いくよほら", ""], [106.5, "ゴー", ""], [108.188, "のぼりきり てっぺん", "サビ 2"], [111.0, "はじけてる ソーダ", ""], [114.188, "グルグルと まわる", ""], [117.0, "したのまち キラキラ", ""], [120.188, "あせのつぶ かわいて", ""], [123.0, "からっぽの むねのなか", ""], [126.0, "そらいろに とけてく", ""], [144.188, "のぼりきり てっぺん", "ラストサビ"], [147.0, "はじけてる ソーダ", ""], [150.188, "グルグルと まわる", ""], [153.0, "したのまち キラキラ", ""], [156.188, "あせのつぶ かわいて", ""], [159.0, "からっぽの むねのなか", ""], [162.0, "あしたへ こいでいく", ""]]}, {"num": "05", "title": "あめのひ", "dur": 203.5, "src": "audio/05.m4a", "lines": [[16.25, "傘はもういらない", "Aメロ"], [20.25, "灰色の空へ", ""], [24.25, "君は濡れても 笑うよ", ""], [28.25, "僕も走り出す", ""], [32.25, "水たまりを越えて", ""], [36.25, "細い雨の中", ""], [40.25, "行く先なんて いらない", ""], [44.25, "君と二人なら", ""], [48.25, "雫の音", "Bメロ"], [50.25, "僕らの声", ""], [52.25, "ひとつになるよ", ""], [56.25, "街の色も", ""], [58.25, "青く染めて", ""], [60.25, "ほら もうすぐだよ", ""], [64.25, "雨の日 走ろう", "サビ"], [68.25, "雨の日 君と", ""], [72.25, "ずぶ濡れのままで 笑い合えたら", ""], [88.25, "頬を伝う雨が", "Aメロ 2"], [92.25, "涙に見えても", ""], [96.25, "寂しいけれど 晴れやか", ""], [100.25, "君とどこまでも", ""], [104.25, "明日のこと", "Bメロ 2"], [106.25, "わからなくて", ""], [108.25, "今はそれでいい", ""], [112.25, "振り返れば", ""], [114.25, "轍がある", ""], [116.25, "二人でつけたよ", ""], [120.25, "雨の日 駆けてく", "サビ 2"], [124.25, "雨の日 どこへ", ""], [128.25, "傘のない空が こんなに広い", ""], [152.25, "雨の日 二人で", "ラストサビ"], [156.25, "雨の日 行こう", ""], [160.25, "雨の日 走ろう", ""], [164.25, "雨の日 君と", ""], [168.25, "進むよ 迷わず 空が晴れてく", ""], [176.25, "雨の日も 悪くない", "エンディング"]]}, {"num": "06", "title": "くだりざかハミング", "dur": 205.1, "src": "audio/06.m4a", "lines": [[14.559, "くものすきま ひかり", "Aメロ"], [17.868, "ぬれたさかみちへ", ""], [21.397, "レインコートを たたんで", ""], [24.926, "さかのうえから せーの", ""], [28.676, "ひとこぎして ふわり", ""], [31.985, "きみのせなかへ", ""], [35.515, "ふりむいて なにかいう", ""], [38.824, "かぜのおとで きこえない", ""], [42.353, "おんなじことを かんじた", "Bメロ"], [46.103, "ひかりのなかで ふたり", ""], [49.632, "ことばよりも さきにでた", ""], [52.941, "はなうたが ほらまた", ""], [56.581, "くだりざか ハミングが とまらない", "サビ"], [60.11, "あめあがり みずたまりを とびこえて", ""], [63.529, "あおいそらへ ペダルはいらない", ""], [67.059, "となりには きみが わらっている", ""], [77.647, "ないてたそらが いまはもう", "Aメロ 2"], [81.176, "うそみたいなあお", ""], [84.926, "まがりかど ひかるうみ", ""], [88.235, "ゆびさすきみ はしゃいでる", ""], [91.765, "いつもとちがう よこがお", "Bメロ 2"], [95.515, "ちかくてとおい ふたり", ""], [99.044, "むねのおくで ふくらんだ", ""], [102.353, "はなうたが ほらまた", ""], [105.993, "くだりざか ハミングが とまらない", "サビ 2"], [109.522, "あめあがり みずたまりを とびこえて", ""], [112.941, "あのにじまで どこまでもゆける", ""], [116.471, "ふりむいたきみが うなずいてる", ""], [127.059, "そらが みずのなか", "ブリッジ"], [130.588, "ゆらりゆれて", ""], [134.338, "きがつけば おなじうた", ""], [137.647, "ハミングが とける", ""], [155.515, "はれたらね いうと", "落ちサビ"], [159.044, "きめていた ひとこと", ""], [162.353, "ねえ", ""], [164.338, "このさきも きみとはしろう", ""], [169.522, "くだりざか ハミングが とまらない", "ラストサビ"], [173.051, "あめあがり みずたまりを とびこえて", ""], [176.471, "あおいそらへ ペダルはいらない", ""], [180.0, "となりには きみが わらっている", ""], [183.529, "そらへ", ""], [185.404, "どこまでもゆける", ""], [187.059, "ふりむいたきみと", ""], [188.824, "ハミングしながら", ""]]}, {"num": "08", "title": "ただいまペダル", "dur": 255.6, "src": "audio/08.m4a", "lines": [[23.571, "かえりみちの そらが", "Aメロ"], [28.214, "オレンジに そまる", ""], [33.929, "ふたつの かげが のびて", ""], [39.643, "ペダル すこし おもい", ""], [46.071, "ちいさく つぶやく", "Bメロ"], [51.786, "ありがとう きょうも", ""], [57.5, "あかりが ともって", ""], [62.857, "いえが みえる", ""], [69.286, "ただいまって いうよ", "サビ"], [73.929, "ゆうやけの みちの さきへ", ""], [80.0, "グルグル めぐる ひびを", ""], [85.714, "ポケットに つめて", ""], [103.571, "あさやけから ずっと", "Aメロ 2"], [108.214, "てっぺんの ソーダ", ""], [113.929, "あめに ぬれて くだって", ""], [119.643, "ぜんぶ たからものさ", ""], [126.071, "くたくたの あしで", "Bメロ 2"], [131.786, "のこりの さかみち", ""], [137.5, "せなかを おされて", ""], [142.857, "あと すこしだ", ""], [149.286, "ただいまって いうよ", "サビ 2"], [153.929, "ゆうやけの みちの さきへ", ""], [160.0, "グルグル めぐる ひびを", ""], [165.714, "ポケットに つめて", ""], [172.143, "となりに きみ", "ブリッジ"], [177.857, "わらう こえ", ""], [183.571, "おなじ ゆうひ", ""], [189.286, "みつめて", ""], [195.0, "ただいまって いうよ", "ラストサビ"], [199.643, "ゆうやけの みちの さきへ", ""], [205.714, "グルグル めぐる ひびを", ""], [211.429, "ポケットに つめたら", ""], [217.857, "おかえりって こえが", ""], [222.5, "まどの あかりの むこうで", ""], [228.571, "みんなに ただいまを", ""], [234.286, "また あした", ""]]}];
+const KEY="guruguru-review-v2";
+let st={marks:{},memos:{},gen:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)st=Object.assign(st,s)}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const $=id=>document.getElementById(id);
+const fmt=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")};
+const ruby=t=>t.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])).replace(/\{([^|}]+)\|([^}]+)\}/g,"<ruby>$1<rt>$2</rt></ruby>");
+const plain=t=>t.replace(/\{([^|}]+)\|[^}]+\}/g,"$1");
+const esc=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let cur=0,pos=0,playing=false,timer=null,loop=false,view={jp:true,ruby:true,ro:false};
+const audio=$("audio");
+const k=(t,i)=>t+"-"+i;
+
+function renderTracks(){
+  $("tracks").innerHTML=TRACKS.map((t,ti)=>{
+    const n=t.lines.length,c=t.lines.filter((_,i)=>st.marks[k(ti,i)]).length;
+    return `<button role="tab" id="tab${ti}" aria-selected="${ti===cur}" data-t="${ti}">
+      <span class="tno">TRACK ${t.num}</span>
+      <span class="tname">${esc(t.title)}</span>
+      <span class="tprog ${c===n?"done":""}">${c}/${n}行 確認</span></button>`}).join("");
+}
+function renderSheet(){
+  const t=TRACKS[cur];
+  $("sheet").innerHTML=t.lines.map((l,i)=>{
+    const m=st.marks[k(cur,i)]||"";
+    return `<div class="ln" data-i="${i}">${l[2]?`<div class="secl">${esc(l[2])}</div>`:""}
+      <button class="ts" data-seek="${l[0]}" aria-label="${fmt(l[0])}から再生">${fmt(l[0])}</button>
+      <div class="txt" data-seek="${l[0]}">
+        <div class="jp">${esc(l[1])}</div>
+      </div>
+      <div class="marks">
+        <button class="mk ok" data-mark="ok" aria-pressed="${m==="ok"}">OK</button>
+        <button class="mk fx" data-mark="fix" aria-pressed="${m==="fix"}">要修正</button>
+      </div>
+      ${m==="fix"?`<div class="memo"><textarea id="memo-${cur}-${i}" data-memo="${i}" placeholder="例：「まわる」の「わ」が「ば」に聞こえる">${esc(st.memos[k(cur,i)]||"")}</textarea></div>`:""}
+    </div>`}).join("");
+  $("gen").value=st.gen[cur]||"";
+  $("pTitle").textContent=`${t.num}. ${t.title}`;
+  $("seek").max=t.dur;
+  updateCount();highlight();
+}
+function updateCount(){
+  const t=TRACKS[cur],fix=t.lines.filter((_,i)=>st.marks[k(cur,i)]==="fix").length,done=t.lines.filter((_,i)=>st.marks[k(cur,i)]).length;
+  $("count").textContent=`${t.lines.length}行中 ${done}行確認 · 要修正 ${fix}`;
+}
+function lineAt(p){const L=TRACKS[cur].lines;let idx=-1;L.forEach((l,i)=>{if(p>=l[0])idx=i});return idx}
+function highlight(){
+  const idx=lineAt(pos);
+  document.querySelectorAll(".ln").forEach(el=>el.classList.toggle("now",+el.dataset.i===idx));
+  $("pTime").textContent=`${fmt(pos)} / ${fmt(TRACKS[cur].dur)}`;
+  $("seek").value=pos;
+}
+function tick(){
+  if(TRACKS[cur].src){pos=audio.currentTime}else{pos+=0.25}
+  if(loop){const L=TRACKS[cur].lines,i=lineAt(pos);if(i>=0){const end=L[i+1]?L[i+1][0]:TRACKS[cur].dur;if(pos>=end){seek(L[i][0]);return}}}
+  if(pos>=TRACKS[cur].dur){pause();pos=0}
+  highlight();
+}
+function play(){
+  playing=true;$("play").textContent="❚❚";$("play").setAttribute("aria-label","一時停止");$("disc").classList.add("spin");
+  if(TRACKS[cur].src){audio.currentTime=pos;audio.play().catch(()=>{})}
+  clearInterval(timer);timer=setInterval(tick,250);
+}
+function pause(){
+  playing=false;$("play").textContent="▶";$("play").setAttribute("aria-label","再生");$("disc").classList.remove("spin");
+  if(TRACKS[cur].src)audio.pause();clearInterval(timer);
+}
+function seek(p){pos=Math.max(0,Math.min(p,TRACKS[cur].dur));if(TRACKS[cur].src)audio.currentTime=pos;highlight()}
+function selectTrack(i){pause();cur=i;pos=0;if(TRACKS[i].src)audio.src=TRACKS[i].src;renderTracks();renderSheet()}
+
+$("tracks").addEventListener("click",e=>{const b=e.target.closest("[data-t]");if(b)selectTrack(+b.dataset.t)});
+$("sheet").addEventListener("click",e=>{
+  const mk=e.target.closest("[data-mark]");
+  if(mk){const i=+mk.closest(".ln").dataset.i,key=k(cur,i),v=mk.dataset.mark;
+    st.marks[key]=st.marks[key]===v?"":v;if(!st.marks[key])delete st.marks[key];save();renderTracks();renderSheet();
+    if(st.marks[key]==="fix"){const ta=$(`memo-${cur}-${i}`);ta&&ta.focus()}return}
+  const s=e.target.closest("[data-seek]");if(s&&!e.target.closest("textarea")){seek(+s.dataset.seek-0.4);if(!playing)play()}
+});
+$("sheet").addEventListener("input",e=>{const ta=e.target.closest("[data-memo]");if(ta){st.memos[k(cur,+ta.dataset.memo)]=ta.value;save()}});
+$("gen").addEventListener("input",e=>{st.gen[cur]=e.target.value;save()});
+$("play").onclick=()=>playing?pause():play();
+$("back").onclick=()=>seek(pos-5);
+$("loop").onclick=()=>{loop=!loop;$("loop").setAttribute("aria-pressed",loop)};
+$("seek").oninput=e=>seek(+e.target.value);
+
+function buildOut(){
+  let o="【グルグル日和 発音チェック】\n";
+  TRACKS.forEach((t,ti)=>{
+    const fixes=t.lines.map((l,i)=>[l,i]).filter(([_,i])=>st.marks[k(ti,i)]==="fix");
+    const done=t.lines.filter((_,i)=>st.marks[k(ti,i)]).length;
+    o+=`\n■ ${t.num}. ${t.title}（${done}/${t.lines.length}行確認）\n`;
+    if(!fixes.length&&!st.gen[ti])o+="  要修正なし\n";
+    fixes.forEach(([l,i])=>{o+=`  [${fmt(l[0])}] ${plain(l[1])}\n    → ${(st.memos[k(ti,i)]||"（メモなし）").replace(/\n/g," ")}\n`});
+    if(st.gen[ti])o+=`  全体: ${st.gen[ti].replace(/\n/g," ")}\n`;
+  });
+  return o;
+}
+$("copy").onclick=()=>{
+  const txt=buildOut(),ta=$("outText");ta.value=txt;
+  const show=()=>{$("toast").hidden=false;setTimeout(()=>$("toast").hidden=true,2000)};
+  const fallback=()=>{ta.hidden=false;ta.focus();ta.select()};
+  try{navigator.clipboard.writeText(txt).then(show,fallback)}catch(e){fallback()}
+};
+audio.addEventListener("ended",()=>{pause();pos=0;highlight()});
+
+if(TRACKS[0].src)audio.src=TRACKS[0].src;
+renderTracks();renderSheet();
+</script>
+</body></html>
